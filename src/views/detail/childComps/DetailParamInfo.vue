@@ -42,6 +42,7 @@
   .param-info table {
     width: 100%;
     border-collapse: collapse;
+
   }
 
   .param-info table tr {

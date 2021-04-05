@@ -7,6 +7,8 @@
       <detail-shop-info :shop="shop"/>
       <detail-goods-info :detail-info="detailInfo" @imageLoad="imageLoad"/>
       <detail-param-info :param-info="paramInfo"/>
+      <detail-comment-info :commentInfo="commentInfo"/>
+      <goods-list :goods="recommendList"></goods-list>
     </scroll>
   </div>
 </template>
@@ -18,10 +20,14 @@
   import DetailShopInfo from './childComps/DetailShopInfo';
   import DetailGoodsInfo from './childComps/DetailGoodsInfo';
   import DetailParamInfo from './childComps/DetailParamInfo';
+  import DetailCommentInfo from './childComps/DetailCommentInfo';
 
   import Scroll from 'components/common/scroll/Scroll';
+  import GoodsList from "components/content/goods/GoodsList";
 
-  import {getDetail, Goods, Shop, GoodsParam} from "network/detail";
+  import {getDetail, getRecommend, Goods, Shop, GoodsParam} from "network/detail";
+  import {debounce} from "common/utils";
+  import {itemLisenerMinxin} from "common/mixin";
 
   export default {
     name: "Detail",
@@ -32,9 +38,12 @@
         goods: {},
         shop: {},
         detailInfo: {},
-        paramInfo: {}
+        paramInfo: {},
+        commentInfo: {},
+        recommendList: []
       }
     },
+    mixin: [itemLisenerMinxin],
     components: {
       DetailNavBar,
       DetailSwiper,
@@ -42,7 +51,9 @@
       DetailShopInfo,
       DetailGoodsInfo,
       DetailParamInfo,
-      Scroll
+      DetailCommentInfo,
+      Scroll,
+      GoodsList
     },
     created() {
       // 1.保存传入的iid
@@ -51,7 +62,7 @@
       // 2.根据iid请求详情数据
       getDetail(this.iid).then(res => {
         // 1.获取顶部的图片轮播数据
-        console.log(res);
+        // console.log(res);
         const data = res.result;
         this.topImages = data.itemInfo.topImages
 
@@ -66,7 +77,32 @@
 
         // 5.获取参数的信息
         this.paramInfo = new GoodsParam(data.itemParams.info, data.itemParams.rule)
+
+        // 6.保存评论信息
+        if (data.rate.list) {
+          this.commentInfo = data.rate.list[0];
+        }
+
       })
+
+      // 3.请求推荐信息
+      // getRecommend().then((res, error) => {
+      //   if (error) return
+      //   this.recommendList = res.data.list
+      // })
+      getRecommend().then(res => {
+        // console.log(res)
+        this.recommendList = res.data.list
+      })
+
+
+    },
+    mounted() {
+
+    },
+    destroyed(){
+      //  console.log('离开详情页');
+      this.$bus.$off('imageLoad', this.itemImgListener)
     },
     methods: {
       imageLoad() {
@@ -90,6 +126,11 @@
     background-color: #fff;
   }
   .content {
-    height: calc(100% - 44px);
+    /*height: calc(100% - 44px);*/
+    position: absolute;
+    top: 44px;
+    left: 0px;
+    right: 0px;
+    bottom: 49px;
   }
 </style>
