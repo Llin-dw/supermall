@@ -54,6 +54,7 @@
         isShowBackTop: true,
         tabOffsetTop: 0,
         isTabFixed: false,
+        saveY: 0
       }
     },
     components: {
@@ -73,6 +74,16 @@
       this.getHomeGoods('pop')
       this.getHomeGoods('new')
       this.getHomeGoods('sell')
+    },
+    destroyed() {
+      console.log('home destroyed');
+    },
+    activated() {
+      this.$refs.scroll.scrollTo(0, this.saveY, 0)
+      this.$refs.scroll.refresh()
+    },
+    deactivated() {
+      this.saveY = this.$refs.scroll.getScrollY()
     },
     mounted() {
 

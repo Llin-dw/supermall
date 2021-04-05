@@ -61,6 +61,9 @@
       finishPullUp() {
         this.scroll && this.scroll.finishPullUp()
       },
+      getScrollY(){
+        return this.scroll.y
+      }
     }
 
   }
