@@ -3,7 +3,7 @@ import { debounce } from "./utils"
 export const itemLisenerMinxin = {
   data() {
     return {
-      itemImgListener: null
+      itemImgListener: null,
     }
   },
   mounted() {
