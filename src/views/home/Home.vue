@@ -26,19 +26,19 @@
 </template>
 
 <script>
-  import HomeSwiper from "./childComps/HomeSwiper";
+  import HomeSwiper from "./childComps/HomeSwiper"
   import RecommendView from "./childComps/RecommendView"
   import FeatureView from "./childComps/FeatureView"
 
-  import NavBar from "components/common/navbar/NavBar";
+  import NavBar from "components/common/navbar/NavBar"
   import TabControl from "components/content/tabControl/TabControl"
   import GoodList from 'components/content/goods/GoodsList'
   import Scroll from 'components/common/scroll/Scroll'
-  import BackTop from 'components/content/backTop/BackTop'
+  // import BackTop from 'components/content/backTop/BackTop'
 
   import {getHomeMultidata, getHomeGoods} from "network/home"
-  import {debounce} from "common/utils";
-  import {itemLisenerMinxin} from "common/mixin";
+  import {debounce} from "common/utils"
+  import {itemLisenerMinxin, backTopMixin} from "common/mixin"
 
   export default {
     name: "Home",
@@ -52,13 +52,13 @@
           'sell': {page: 0, list: []},
         },
         currentType: 'pop',
-        isShowBackTop: true,
+        // isShowBackTop: true,
         tabOffsetTop: 0,
         isTabFixed: false,
         saveY: 0
       }
     },
-    mixin: [itemLisenerMinxin],
+    mixins: [itemLisenerMinxin, backTopMixin],
     components: {
       HomeSwiper,
       RecommendView,
@@ -67,7 +67,7 @@
       TabControl,
       GoodList,
       Scroll,
-      BackTop
+      // BackTop
     },
     created() {
     //  1.请求多个数据
@@ -116,16 +116,20 @@
         this.$refs.tabControl1.currentIndex = index;
         this.$refs.tabControl2.currentIndex = index;
       },
-      backClick() {
-        this.$refs.scroll.scrollTo(0, 0)
-      },
+      // backClick() {
+      //   this.$refs.scroll.scrollTo(0, 0)
+      // },
       contentScroll(position) {
         // 1.判断BackTop是否显示
-        this.isShowBackTop = (-position.y) > 1000
+        this.listenShowBackTop(position)
 
         // 2.决定tabControl是否吸顶(position: fixed)
         this.isTabFixed = (-position.y) > this.tabOffsetTop
       },
+      // listenShowBackTop(position) {
+      //   // 1.判断BackTop是否显示
+      //   this.isShowBackTop = (-position.y) > 1000
+      // },
       loadMore() {
         this.getHomeGoods(this.currentType)
       },

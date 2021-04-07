@@ -8,8 +8,10 @@
       <detail-goods-info :detail-info="detailInfo" @imageLoad="detailImageLoad"/>
       <detail-param-info ref="params" :param-info="paramInfo"/>
       <detail-comment-info ref="comment" :commentInfo="commentInfo"/>
-      <goods-list ref="recommend" :goods="recommendList"></goods-list>
+      <goods-list ref="recommend" :goods="recommendList"/>
     </scroll>
+    <back-top @click.native="backClick" v-show="isShowBackTop"/>
+    <detail-bottom-bar @addToCart="addToCart"/>
   </div>
 </template>
 
@@ -21,13 +23,14 @@
   import DetailGoodsInfo from './childComps/DetailGoodsInfo';
   import DetailParamInfo from './childComps/DetailParamInfo';
   import DetailCommentInfo from './childComps/DetailCommentInfo';
+  import DetailBottomBar from './childComps/DetailBottomBar';
 
   import Scroll from 'components/common/scroll/Scroll';
   import GoodsList from "components/content/goods/GoodsList";
 
   import {getDetail, getRecommend, Goods, Shop, GoodsParam} from "network/detail";
   import {debounce} from "common/utils";
-  import {itemLisenerMinxin} from "common/mixin";
+  import {itemLisenerMinxin ,backTopMixin} from "common/mixin";
 
   export default {
     name: "Detail",
@@ -46,7 +49,7 @@
         currentIndex: 0
       }
     },
-    mixin: [itemLisenerMinxin],
+    mixins: [itemLisenerMinxin, backTopMixin],
     components: {
       DetailNavBar,
       DetailSwiper,
@@ -55,6 +58,7 @@
       DetailGoodsInfo,
       DetailParamInfo,
       DetailCommentInfo,
+      DetailBottomBar,
       Scroll,
       GoodsList
     },
@@ -134,7 +138,8 @@
         this.themeTopYs.push(this.$refs.params.$el.offsetTop);
         this.themeTopYs.push(this.$refs.comment.$el.offsetTop);
         this.themeTopYs.push(this.$refs.recommend.$el.offsetTop);
-        console.log(this.themeTopYs)
+        this.themeTopYs.push(Number.MAX_VALUE);
+        // console.log(this.themeTopYs)
       },
       contentScroll(position) {
         // console.log(position)
@@ -144,18 +149,45 @@
       //  positionY值与主题中值进行对比
         const length = this.themeTopYs.length
         for(let i = 0;i < length-1; i++) {
-            if((this.currentIndex !== i) && ((i < length -1 && positionY >= this.themeTopYs[i] && positionY < this.themeTopYs[i+1])
-              || (i === length -1 && positionY >= this.themeTopYs[i]))){
+            // 普通做法
+            // if((this.currentIndex !== i) && ((i < length -1 && positionY >= this.themeTopYs[i] && positionY < this.themeTopYs[i+1])
+            //   || (i === length -1 && positionY >= this.themeTopYs[i]))){
+            //   this.currentIndex = i
+            //   console.log(this.currentIndex)
+            //   this.$refs.nav.currentIndex = this.currentIndex
+            // }
+
+            // hark做法
+            // 在themeTopYs里添加一个很大的值（js中最大的值）后再进行判断
+            if ((this.currentIndex !== i) &&
+                (positionY >= this.themeTopYs[i] && positionY < this.themeTopYs[i +1])) {
               this.currentIndex = i
-              console.log(this.currentIndex)
+              // console.log(this.currentIndex)
               this.$refs.nav.currentIndex = this.currentIndex
             }
         }
+        // // .判断BackTop是否显示
+        // this.isShowBackTop = (-position.y) > 1000
+        // 判断BackTop是否显示
+        this.listenShowBackTop(position)
       },
       titleClick(index) {
         // console.log(index);
         // console.log(this.themeTopYs[index]);
         this.$refs.scroll.scrollTo(0,-this.themeTopYs[index])
+      },
+      addToCart() {
+      //  1.获取购物车需要展示的信息
+        const product = {}
+        product.image = this.topImages[0]
+        product.title = this.goods.title
+        product.desc = this.goods.desc
+        product.price = this.goods.realPrice
+        product.iid = this.iid
+
+      //  2.将商品添加到购物车里
+      //   this.$store.commit('addCart', product)
+        this.$store.dispatch('addCart', product)
       }
     }
 
