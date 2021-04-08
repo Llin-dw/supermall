@@ -1,16 +1,26 @@
 <template>
-  <div>
-    <h1>分类</h1>
+  <div class="category">
+    <nav-bar>
+      <div slot="center">分类</div>
+    </nav-bar>
   </div>
 
 </template>
 
 <script>
+  import NavBar from 'components/common/navbar/NavBar'
+
   export default {
-    name: "Category"
+    name: "Category",
+    components: {
+      NavBar
+    }
   }
 </script>
 
 <style scoped>
-
+.category{
+  background-color: var(--color-tint);
+  color: #fff;
+}
 </style>

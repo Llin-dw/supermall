@@ -3,6 +3,7 @@
     <!--  导航 -->
     <nav-bar class="nav-bar">
       <div slot="center">购物车({{length}})</div>
+      <div slot="right" @click="deleteAll">清空</div>
     </nav-bar>
     <!--  商品的列表  -->
     <scroll class="content">
@@ -23,6 +24,7 @@
   import Scroll from "components/common/scroll/Scroll";
 
   import { mapGetters } from 'vuex'
+  import {mapActions} from 'vuex'
 
   export default {
     name: "Cart",
@@ -42,6 +44,12 @@
       ...mapGetters({
         length: 'cartLength'
       })
+    },
+    methods: {
+      ...mapActions(['deleteAllItem']),
+      deleteAll() {
+        this.deleteAllItem()
+      }
     }
   }
 </script>

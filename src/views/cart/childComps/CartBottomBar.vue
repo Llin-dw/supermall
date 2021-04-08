@@ -1,13 +1,13 @@
 <template>
   <div class="button-bar">
     <div class="allSelect">
-      <check-button/>
+      <check-button :isChecked='isSelectAll' @click.native="allClick"/>
       <span>全选</span>
     </div>
     <div class="totalPrice">
       合计：{{ totalPrice }}
     </div>
-    <div class="calculate">
+    <div class="calculate" @click="calculateClick">
       去计算：{{ checkLength }}
     </div>
   </div>
@@ -32,6 +32,29 @@
       checkLength(){
         return this.cartList.filter(item => item.checked).length
       },
+      isSelectAll() {
+        // 方法一：性能不好，回遍历所有数组
+        // if (this.cartList.length === 0) return false
+        // return  !(this.cartList.filter(item => !item.checked).length)
+
+        //方法二：只要找到有一个cartList是未选中的就停止查找
+        if (this.cartList.length === 0) return false
+        return !(this.cartList.find(item => !item.checked))
+      }
+    },
+    methods: {
+      allClick() {
+        if(this.isSelectAll) {
+          this.cartList.forEach(item => item.checked = false)
+        } else {
+          this.cartList.forEach(item => item.checked = true)
+        }
+      },
+      calculateClick() {
+        if(!this.checkLength) {
+          this.$toast.show('请选择商品',1000)
+        }
+      }
     }
   }
 </script>

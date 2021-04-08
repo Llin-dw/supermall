@@ -6,13 +6,17 @@
         <img :src="product.image" alt="">
       </div>
       <div class="item-message">
-        <span><p>{{product.title}}</p></span>
-        <div>{{product.desc}}</div>
+        <span @click='itemClick'><p>{{product.title}}</p></span>
+        <div @click='itemClick'>{{product.desc}}</div>
 
         <p>
           <strong>{{'￥'+ product.price}}</strong>
-          <span>删除</span>
-          <i><button>-</button> {{'x'+product.count}} <button>+</button></i>
+          <span @click='deleteClick'>删除</span>
+          <i>
+            <button @click="des">-</button>
+            {{'x'+product.count}}
+            <button @click="add">+</button>
+          </i>
         </p>
       </div>
     </div>
@@ -21,6 +25,7 @@
 
 <script>
   import CheckButton from 'components/content/CheckButton/CheckButton'
+  import { mapActions } from 'vuex'
 
   export default {
     name: "CartListItem",
@@ -36,9 +41,24 @@
       }
     },
     methods: {
+      ...mapActions(['deleteOne']),
       ButtonClick(){
         this.product.checked = !this.product.checked
       },
+      itemClick() {
+        this.$router.push('/detail/'+this.product.iid)
+      },
+      des() {
+        if(this.product.count > 1) {
+          this.product.count--
+        }
+      },
+      add() {
+        this.product.count++
+      },
+      deleteClick() {
+        this.deleteOne(this.product.iid)
+      }
     }
   }
 
